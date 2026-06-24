@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RestTestController;
 
+Route::apiResource('rest', RestTestController::class)->names('restTest');
 Route::get('/', function () {
     return view('welcome');
 });
