@@ -52,7 +52,8 @@ class BlogCategoryRepository extends CoreRepository
 
         $result = $this
             ->startConditions()
-            ->select($columns) // Оптимізація: беремо тільки потрібні стовпці
+            ->select($columns)
+            ->with(['parentCategory:id,title']) // <-- Додаємо підвантаження батьківської категорії
             ->paginate($perPage);
 
         return $result;

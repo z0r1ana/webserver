@@ -9,8 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BlogPost extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
+
+    const UNKNOWN_USER = 1; // <-- Додано константу
 
     protected $fillable = [
         'title',
@@ -20,20 +21,14 @@ class BlogPost extends Model
         'content_raw',
         'is_published',
         'published_at',
-        'user_id',
+        // 'user_id' видалено для безпеки!
     ];
 
-    /**
-     * Категорія статті (Стаття належить категорії)
-     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(BlogCategory::class);
     }
 
-    /**
-     * Автор статті (Стаття належить користувачу)
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
