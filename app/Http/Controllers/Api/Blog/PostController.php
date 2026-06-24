@@ -1,36 +1,40 @@
 <?php
 
-namespace App\Http\Controllers\Api\Blog;
+namespace App\Http\Controllers\Api\Blog\Admin;
 
+use App\Repositories\BlogPostRepository;
 use Illuminate\Http\Request;
-use App\Models\BlogPost;
 
 class PostController extends BaseController
 {
+    // Впроваджуємо репозиторій через конструктор
+    public function __construct(private BlogPostRepository $blogPostRepository)
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Вивід списку статей для адмінки
+     */
     public function index()
     {
-        // Отримуємо всі пости, крім м'яко видалених
-        $items = BlogPost::all();
-        return $items;
+        $paginator = $this->blogPostRepository->getAllWithPaginate();
+
+        return $paginator;
     }
 
     public function store(Request $request)
     {
-        //
-    }
-
-    public function show(string $id)
-    {
-        //
+        // Логіка створення буде пізніше
     }
 
     public function update(Request $request, string $id)
     {
-        //
+        // Логіка оновлення буде пізніше
     }
 
     public function destroy(string $id)
     {
-        //
+        // Логіка видалення буде пізніше
     }
 }
