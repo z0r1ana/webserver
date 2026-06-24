@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Api\Blog\Admin;
 
 use App\Models\BlogCategory;
-use Illuminate\Http\Request;
+use App\Http\Requests\BlogCategoryCreateRequest; // <-- Додано
+use App\Http\Requests\BlogCategoryUpdateRequest; // <-- Додано
 use Illuminate\Support\Str;
 
 class CategoryController extends BaseController
 {
     /**
-     * Отримання списку категорій з пагінацією (по 5 на сторінку)
+     * Отримання списку категорій з пагінацією
      */
     public function index()
     {
@@ -18,38 +19,33 @@ class CategoryController extends BaseController
     }
 
     /**
-     * Створення нової категорії (РЕАЛІЗАЦІЯ ЗАВДАННЯ)
+     * Створення нової категорії з валідацією
      */
-    public function store(Request $request)
+    public function store(BlogCategoryCreateRequest $request) // <-- Змінено Request на BlogCategoryCreateRequest
     {
-        $data = $request->all();
+        $data = $request->input(); // отримуємо масив даних, які надійшли з форми
 
-        // Якщо користувач не вказав slug, генеруємо його автоматично з title
         if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']);
+            $data['slug'] = Str::slug($data['title']); // генеруємо псевдонім
         }
 
-        // Створюємо запис в базі даних
-        $item = BlogCategory::create($data);
+        // Створюємо об'єкт і додаємо в БД
+        $item = (new BlogCategory())->create($data);
 
         if ($item) {
             return [
                 'success' => true,
-                'message' => 'Успішно створено',
-                'id' => $item->id
+                'message' => 'Успішно збережено'
             ];
         } else {
-            return [
-                'success' => false,
-                'message' => 'Помилка створення'
-            ];
+            return ['message' => 'Помилка збереження'];
         }
     }
 
     /**
-     * Оновлення існуючої категорії
+     * Оновлення існуючої категорії з валідацією
      */
-    public function update(Request $request, string $id)
+    public function update(BlogCategoryUpdateRequest $request, $id) // <-- Змінено Request на BlogCategoryUpdateRequest
     {
         $item = BlogCategory::find($id);
 
@@ -68,7 +64,7 @@ class CategoryController extends BaseController
         if ($result) {
             return [
                 'success' => true,
-                'message' => 'Успішно збережено'
+                'message' => 'Успішно збережено' // <-- Виправлено синтаксис (додано кому в масиві)
             ];
         } else {
             return ['message' => 'Помилка збереження'];
