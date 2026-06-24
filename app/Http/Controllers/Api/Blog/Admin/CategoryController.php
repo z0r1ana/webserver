@@ -3,33 +3,41 @@
 namespace App\Http\Controllers\Api\Blog\Admin;
 
 use App\Models\BlogCategory;
-use App\Http\Requests\BlogCategoryCreateRequest; // <-- Додано
-use App\Http\Requests\BlogCategoryUpdateRequest; // <-- Додано
+use App\Http\Requests\BlogCategoryCreateRequest;
+use App\Http\Requests\BlogCategoryUpdateRequest;
+use App\Repositories\BlogCategoryRepository; // <-- Додано імпорт репозиторію
 use Illuminate\Support\Str;
 
 class CategoryController extends BaseController
 {
+    // Впроваджуємо репозиторій через конструктор
+    public function __construct(private BlogCategoryRepository $blogCategoryRepository)
+    {
+        parent::__construct();
+    }
+
     /**
-     * Отримання списку категорій з пагінацією
+     * Отримання списку категорій з пагінацією через РЕПОЗИТОРІЙ
      */
     public function index()
     {
-        $paginator = BlogCategory::paginate(5);
+        // Оптимізований запит через репозиторій
+        $paginator = $this->blogCategoryRepository->getAllWithPaginate(5);
+
         return $paginator;
     }
 
     /**
-     * Створення нової категорії з валідацією
+     * Створення нової категорії
      */
-    public function store(BlogCategoryCreateRequest $request) // <-- Змінено Request на BlogCategoryCreateRequest
+    public function store(BlogCategoryCreateRequest $request)
     {
-        $data = $request->input(); // отримуємо масив даних, які надійшли з форми
+        $data = $request->input();
 
         if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['title']); // генеруємо псевдонім
+            $data['slug'] = Str::slug($data['title']);
         }
 
-        // Створюємо об'єкт і додаємо в БД
         $item = (new BlogCategory())->create($data);
 
         if ($item) {
@@ -43,11 +51,12 @@ class CategoryController extends BaseController
     }
 
     /**
-     * Оновлення існуючої категорії з валідацією
+     * Оновлення існуючої категорії через РЕПОЗИТОРІЙ
      */
-    public function update(BlogCategoryUpdateRequest $request, $id) // <-- Змінено Request на BlogCategoryUpdateRequest
+    public function update(BlogCategoryUpdateRequest $request, $id)
     {
-        $item = BlogCategory::find($id);
+        // Отримуємо запис через репозиторій
+        $item = $this->blogCategoryRepository->getEdit($id);
 
         if (empty($item)) {
             return ['message' => "Запис id=[{$id}] не знайдено"];
@@ -64,7 +73,7 @@ class CategoryController extends BaseController
         if ($result) {
             return [
                 'success' => true,
-                'message' => 'Успішно збережено' // <-- Виправлено синтаксис (додано кому в масиві)
+                'message' => 'Успішно збережено'
             ];
         } else {
             return ['message' => 'Помилка збереження'];

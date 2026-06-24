@@ -6,5 +6,11 @@ use App\Http\Controllers\Api\Blog\BaseController as GuestBaseController;
 
 abstract class BaseController extends GuestBaseController
 {
-    // Спільна логіка для адмін-контролерів
+    /**
+     * BaseController constructor
+     */
+    public function __construct()
+    {
+        // Ініціалізація загальних елементів адмінки
+    }
 }
